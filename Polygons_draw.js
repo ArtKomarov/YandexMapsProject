@@ -113,12 +113,12 @@ function drawMap(input) {
         }
 
         // Debug print
-        //console.log("Processed arrays: republicPolygonArr, classArr, latArr, lonArr, polygonArr");
-        //console.log(republicPolygonArr);
-        //console.log(classArr);
-        //console.log(latArr);
-        //console.log(lonArr);
-        //console.log(polygonArr);
+        console.log("Processed arrays: republicPolygonArr, classArr, latArr, lonArr, polygonArr");
+        console.log(republicPolygonArr);
+        console.log(classArr);
+        console.log(latArr);
+        console.log(lonArr);
+        console.log(polygonArr);
 
 
         // Min and max coordinates in area polygons
@@ -128,8 +128,8 @@ function drawMap(input) {
         var max_lon = republicPolygonArr[0][0][0][0][1]
 
         // Paddings
-        var lat_padding = 10
-        var lon_padding = 10
+        var lat_padding = 100
+        var lon_padding = 100
         //var SCREEN_PROPERTY = 1920 / 1080
 
         // Get bounding box
@@ -157,23 +157,29 @@ function drawMap(input) {
             }
         }
 
-        // Set paddings for square area
-        //if ((max_lat - min_lat) * SCREEN_PROPERTY > max_lon - min_lon)
-        //    lon_padding += ((max_lat - min_lat) * SCREEN_PROPERTY - (max_lon - min_lon))
-        //else
-        //    lat_padding += ((max_lon - min_lon) - (max_lat - min_lat) * SCREEN_PROPERTY)
+        min_lat -= lat_padding
+        max_lat += lat_padding
+        min_lon -= lon_padding
+        max_lon += lon_padding
 
-        //if (max_lat - min_lat > max_lon - min_lon)
-        //    lon_padding += ((max_lat - min_lat) - (max_lon - min_lon)) / 2
-        //else
-        //    lat_padding += ((max_lon - min_lon) - (max_lat - min_lat)) / 2
+        if (min_lat <= -90)
+            min_lat = -89
+
+        if (max_lat >= 90)
+            max_lat = 89
+
+        if (min_lon <= -180)
+            min_lon = -179
+
+        if (max_lon >= 180)
+            max_lon = 179
 
         // Debug print
-        //console.log("Min, max lat and min, max lon");
-        //console.log(min_lat);
-        //console.log(max_lat);
-        //console.log(min_lon);
-        //console.log(max_lon);
+        console.log("Min, max lat and min, max lon");
+        console.log(min_lat);
+        console.log(max_lat);
+        console.log(min_lon);
+        console.log(max_lon);
 
         // Start Yandex Maps drawing part
         ymaps.ready(init);
@@ -187,8 +193,8 @@ function drawMap(input) {
             }, {
                 // Let's limit the area of the map.
                 restrictMapArea: [
-                    [min_lat - lat_padding, min_lon - lon_padding],
-                    [max_lat + lat_padding, max_lon + lon_padding]
+                    [min_lat, min_lon],
+                    [max_lat, max_lon]
                 ]
             });
             map.controls.get('zoomControl').options.set({size: 'small'});
@@ -201,11 +207,11 @@ function drawMap(input) {
                 // Create polygon which will hide all world, except future defined area
                 var background = new ymaps.Polygon([
                     [
-                        [min_lat - 4 * lat_padding, min_lon - 4 * lon_padding],
-                        [min_lat - 4 * lat_padding, max_lon + 4 * lon_padding],
-                        [max_lat + 4 * lat_padding, max_lon + 4 * lon_padding],
-                        [max_lat + 4 * lat_padding, min_lon - 4 * lon_padding],
-                        [min_lat - 4 * lat_padding, min_lon - 4 * lon_padding]
+                        [min_lat, min_lon],
+                        [min_lat, max_lon],
+                        [max_lat, max_lon],
+                        [max_lat, min_lon],
+                        [min_lat, min_lon]
                     ]
                 ], {}, {
                     fillColor: '#ffffff',
@@ -237,21 +243,37 @@ function drawMap(input) {
 
             // Colors for classes
             colors = [
-                "#800000", // 1
-                "#DC143C", // 2
-                "#A0522D", // 3
-                "#FF0000", // 4
-                "#FF7F50", // 5
-                "#FFD700", // 6
-                "#ADFF2F", // 7
-                "#6B8E23", // 8
-                "#6495ED", // 9
-                "#6A5ACD", // 10
-                "#191970", // 11
-                "#008080", // 12
-                "#9932CC", // 13
-                "#800080", // 14
-                "#000000"  // 15
+                "#e6817e", // 1
+                "#e6817e", // 2
+                "#e6aa7e", // 3
+                "#e6d37e", // 4
+                "#cfe67e", // 5
+                "#a6e67e", // 6
+                "#7ee680", // 7
+                "#7ee6a9", // 8
+                "#7ee6d2", // 9
+                "#7ed0e6", // 10
+                "#7ea7e6", // 11
+                "#7f7ee6", // 12
+                "#a87ee6", // 13
+                "#d17ee6", // 14
+                "#e67ea7", // 15
+                "#b3b3b3",
+                "#e6817e",
+                "#e6aa7e",
+                "#e6d37e",
+                "#cfe67e",
+                "#a6e67e",
+                "#7ee680",
+                "#7ee6a9",
+                "#7ee6d2",
+                "#7ed0e6",
+                "#7ea7e6",
+                "#7f7ee6",
+                "#a87ee6",
+                "#d17ee6",
+                "#e67ed1",
+                "#000000"
             ]
 
             // Add place marks
@@ -263,10 +285,10 @@ function drawMap(input) {
                 for (var j = 0; j < classes.length; j++) {
                     var class_j = parseInt(classes[j]);
 
-                    if (class_j >= 0 && class_j <= 15) {
+                    if (class_j >= 1 && class_j <= 15) {
                         dataDict.push({
                             weight: 1,
-                            color: colors[class_j]
+                            color: colors[class_j - 1]
                         });
                     }
                 }
